@@ -85,6 +85,14 @@ func parsePart(minutes string) ([]int, error) {
 		return multipleValues, nil
 	}
 
+	if minutes == "*" {
+		multipleValues, err := generateValuesForRange("0", "59")
+		if err != nil {
+			return []int{}, err
+		}
+		return multipleValues, nil
+	}
+
 	res, err := strconv.Atoi(minutes)
 	if err != nil {
 		return []int{}, err
@@ -130,6 +138,10 @@ func generateValuesForRange(start string, stop string) ([]int, error) {
 }
 
 func generateValuesForRangeWithStep(start string, step string, maxValue int) ([]int, error) {
+	if start == "*" {
+		return generateValuesForRangeWithStep("0", step, maxValue)
+	}
+
 	startParsed, err := strconv.Atoi(start)
 	if err != nil {
 		return []int{}, err
