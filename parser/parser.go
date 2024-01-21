@@ -1,7 +1,9 @@
 package parser
 
 import (
+	"cron_expression_parser/parser/helpers"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -14,8 +16,6 @@ type Parser struct {
 	command string
 }
 
-// * * * * * Command_to_execute
-
 func NewParser() *Parser {
 	return &Parser{}
 }
@@ -25,8 +25,8 @@ func (p *Parser) Parse(input string) error {
 	if err != nil {
 		return err
 	}
-
 	err = p.performParse(inputTab)
+	fmt.Println(helpers.GetMinMinutesValue())
 	if err != nil {
 		return err
 	}
@@ -58,8 +58,8 @@ func (p *Parser) performParse(slicedInput []string) error {
 }
 
 func parsePart(minutes string) ([]int, error) {
-	if strings.Contains(minutes, "/") {
-		split := strings.Split(minutes, "/")
+	if strings.Contains(minutes, helpers.STEP_OPERATOR) {
+		split := strings.Split(minutes, helpers.STEP_OPERATOR)
 		multipleValues, err := generateValuesForRangeWithStep(split[0], split[1], 59)
 		if err != nil {
 			return []int{}, err
@@ -67,8 +67,8 @@ func parsePart(minutes string) ([]int, error) {
 		return multipleValues, nil
 	}
 
-	if strings.Contains(minutes, "-") {
-		split := strings.Split(minutes, "-")
+	if strings.Contains(minutes, helpers.RANGE_OPERATOR) {
+		split := strings.Split(minutes, helpers.RANGE_OPERATOR)
 		multipleValues, err := generateValuesForRange(split[0], split[1])
 		if err != nil {
 			return []int{}, err
@@ -76,8 +76,8 @@ func parsePart(minutes string) ([]int, error) {
 		return multipleValues, nil
 	}
 
-	if strings.Contains(minutes, ",") {
-		split := strings.Split(minutes, ",")
+	if strings.Contains(minutes, helpers.LISTING_OPRATOR) {
+		split := strings.Split(minutes, helpers.LISTING_OPRATOR)
 		multipleValues, err := parseMultipleIntsFromStringsSlice(split)
 		if err != nil {
 			return []int{}, err
@@ -85,7 +85,7 @@ func parsePart(minutes string) ([]int, error) {
 		return multipleValues, nil
 	}
 
-	if minutes == "*" {
+	if minutes == helpers.ASTERIKS {
 		multipleValues, err := generateValuesForRange("0", "59")
 		if err != nil {
 			return []int{}, err
