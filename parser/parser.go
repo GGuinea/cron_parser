@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"cron_expression_parser/parser/consts"
 	"cron_expression_parser/parser/helpers"
 	"errors"
 	"fmt"
@@ -26,7 +27,7 @@ func (p *Parser) Parse(input string) error {
 		return err
 	}
 	err = p.performParse(inputTab)
-	fmt.Println(helpers.GetMinMinutesValue())
+	fmt.Println(consts.GetMinMinutesValue())
 	if err != nil {
 		return err
 	}
@@ -58,35 +59,35 @@ func (p *Parser) performParse(slicedInput []string) error {
 }
 
 func parsePart(minutes string) ([]int, error) {
-	if strings.Contains(minutes, helpers.STEP_OPERATOR) {
-		split := strings.Split(minutes, helpers.STEP_OPERATOR)
-		multipleValues, err := generateValuesForRangeWithStep(split[0], split[1], 59)
+	if strings.Contains(minutes, consts.STEP_OPERATOR) {
+		split := strings.Split(minutes, consts.STEP_OPERATOR)
+		multipleValues, err := helpers.GenerateValuesForRangeWithStep(split[0], split[1], 59)
 		if err != nil {
 			return []int{}, err
 		}
 		return multipleValues, nil
 	}
 
-	if strings.Contains(minutes, helpers.RANGE_OPERATOR) {
-		split := strings.Split(minutes, helpers.RANGE_OPERATOR)
-		multipleValues, err := generateValuesForRange(split[0], split[1])
+	if strings.Contains(minutes, consts.RANGE_OPERATOR) {
+		split := strings.Split(minutes, consts.RANGE_OPERATOR)
+		multipleValues, err := helpers.GenerateValuesForRange(split[0], split[1])
 		if err != nil {
 			return []int{}, err
 		}
 		return multipleValues, nil
 	}
 
-	if strings.Contains(minutes, helpers.LISTING_OPRATOR) {
-		split := strings.Split(minutes, helpers.LISTING_OPRATOR)
-		multipleValues, err := parseMultipleIntsFromStringsSlice(split)
+	if strings.Contains(minutes, consts.LISTING_OPRATOR) {
+		split := strings.Split(minutes, consts.LISTING_OPRATOR)
+		multipleValues, err := helpers.GetMultipleIntsFromStringsSlice(split)
 		if err != nil {
 			return []int{}, err
 		}
 		return multipleValues, nil
 	}
 
-	if minutes == helpers.ASTERIKS {
-		multipleValues, err := generateValuesForRange("0", "59")
+	if minutes == consts.ASTERIKS {
+		multipleValues, err := helpers.GenerateValuesForRange("0", "59")
 		if err != nil {
 			return []int{}, err
 		}
@@ -98,64 +99,4 @@ func parsePart(minutes string) ([]int, error) {
 		return []int{}, err
 	}
 	return []int{res}, nil
-}
-
-func parseMultipleIntsFromStringsSlice(inputToParse []string) ([]int, error) {
-	res := []int{}
-
-	for _, elem := range inputToParse {
-		parsed, err := strconv.Atoi(elem)
-		if err != nil {
-			return []int{}, err
-		}
-		res = append(res, parsed)
-	}
-
-	return res, nil
-}
-
-func generateValuesForRange(start string, stop string) ([]int, error) {
-	startParsed, err := strconv.Atoi(start)
-	if err != nil {
-		return []int{}, err
-	}
-
-	stopParsed, err := strconv.Atoi(stop)
-	if err != nil {
-		return []int{}, err
-	}
-
-	if startParsed > stopParsed {
-		return []int{}, errors.New("Wrong range values")
-	}
-
-	res := []int{}
-	for i := startParsed; i <= stopParsed; i++ {
-		res = append(res, i)
-	}
-
-	return res, nil
-}
-
-func generateValuesForRangeWithStep(start string, step string, maxValue int) ([]int, error) {
-	if start == "*" {
-		return generateValuesForRangeWithStep("0", step, maxValue)
-	}
-
-	startParsed, err := strconv.Atoi(start)
-	if err != nil {
-		return []int{}, err
-	}
-
-	stepParsed, err := strconv.Atoi(step)
-	if err != nil {
-		return []int{}, err
-	}
-
-	res := []int{}
-	for i := startParsed; i <= maxValue; i += stepParsed {
-		res = append(res, i)
-	}
-
-	return res, nil
 }
