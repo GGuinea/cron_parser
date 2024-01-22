@@ -52,17 +52,3 @@ func GenerateValuesForRangeWithStep(start string, step string, maxValue, minValu
 
 	return res, nil
 }
-
-func GetMultipleIntsFromStringsSlice(inputToParse []string) ([]int, error) {
-	res := []int{}
-
-	for _, elem := range inputToParse {
-		parsed, err := strconv.Atoi(elem)
-		if err != nil {
-			return []int{}, err
-		}
-		res = append(res, parsed)
-	}
-
-	return res, nil
-}

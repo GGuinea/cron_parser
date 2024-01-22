@@ -122,45 +122,61 @@ func isOutputValid(output []int, partType consts.Value) bool {
 	return true
 }
 
-func parsePart(minutes string, partType consts.Value) ([]int, error) {
-	if strings.Contains(minutes, consts.STEP_OPERATOR) {
-		split := strings.Split(minutes, consts.STEP_OPERATOR)
-		multipleValues, err := helpers.GenerateValuesForRangeWithStep(split[0], split[1], partType.GetMaxValue(), partType.GetMinValue())
-		if err != nil {
-			return []int{}, err
-		}
-		return multipleValues, nil
+func parsePart(inputPart string, partType consts.Value) ([]int, error) {
+	if strings.Contains(inputPart, consts.STEP_OPERATOR) {
+		return parsePartWithStep(inputPart, partType)
 	}
 
-	if strings.Contains(minutes, consts.RANGE_OPERATOR) {
-		split := strings.Split(minutes, consts.RANGE_OPERATOR)
-		multipleValues, err := helpers.GenerateValuesForRange(split[0], split[1])
-		if err != nil {
-			return []int{}, err
-		}
-		return multipleValues, nil
+	if strings.Contains(inputPart, consts.RANGE_OPERATOR) {
+		return parsePartWithRange(inputPart, partType)
 	}
 
-	if strings.Contains(minutes, consts.LISTING_OPRATOR) {
-		split := strings.Split(minutes, consts.LISTING_OPRATOR)
-		multipleValues, err := helpers.GetMultipleIntsFromStringsSlice(split)
-		if err != nil {
-			return []int{}, err
-		}
-		return multipleValues, nil
+	if strings.Contains(inputPart, consts.LISTING_OPRATOR) {
+		return parsePartWithListing(inputPart, partType)
 	}
 
-	if minutes == consts.ASTERIKS {
-		multipleValues, err := helpers.GenerateValuesForRange(fmt.Sprint(partType.GetMinValue()), fmt.Sprint(partType.GetMaxValue()))
-		if err != nil {
-			return []int{}, err
-		}
-		return multipleValues, nil
+	if inputPart == consts.ASTERIKS {
+		return parsePartWithAsteriks(inputPart, partType)
 	}
 
-	res, err := strconv.Atoi(minutes)
+	res, err := strconv.Atoi(inputPart)
 	if err != nil {
 		return []int{}, err
 	}
 	return []int{res}, nil
+}
+
+func parsePartWithStep(partWithStep string, partType consts.Value) ([]int, error) {
+	split := strings.Split(partWithStep, consts.STEP_OPERATOR)
+	multipleValues, err := helpers.GenerateValuesForRangeWithStep(split[0], split[1], partType.GetMaxValue(), partType.GetMinValue())
+	if err != nil {
+		return []int{}, err
+	}
+	return multipleValues, nil
+}
+
+func parsePartWithRange(partWithRange string, partType consts.Value) ([]int, error) {
+	split := strings.Split(partWithRange, consts.RANGE_OPERATOR)
+	multipleValues, err := helpers.GenerateValuesForRange(split[0], split[1])
+	if err != nil {
+		return []int{}, err
+	}
+	return multipleValues, nil
+}
+
+func parsePartWithListing(partWithListing string, partType consts.Value) ([]int, error) {
+	split := strings.Split(partWithListing, consts.LISTING_OPRATOR)
+	multipleValues, err := helpers.GetMultipleIntsFromStringsSlice(split)
+	if err != nil {
+		return []int{}, err
+	}
+	return multipleValues, nil
+}
+
+func parsePartWithAsteriks(partWithAsteriks string, partType consts.Value) ([]int, error) {
+	multipleValues, err := helpers.GenerateValuesForRange(fmt.Sprint(partType.GetMinValue()), fmt.Sprint(partType.GetMaxValue()))
+	if err != nil {
+		return []int{}, err
+	}
+	return multipleValues, nil
 }
