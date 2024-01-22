@@ -123,16 +123,16 @@ func isOutputValid(output []int, partType consts.Value) bool {
 }
 
 func parsePart(inputPart string, partType consts.Value) ([]int, error) {
+	if strings.Contains(inputPart, consts.LISTING_OPRATOR) {
+		return parsePartWithListing(inputPart, partType)
+	}
+
 	if strings.Contains(inputPart, consts.STEP_OPERATOR) {
 		return parsePartWithStep(inputPart, partType)
 	}
 
 	if strings.Contains(inputPart, consts.RANGE_OPERATOR) {
 		return parsePartWithRange(inputPart, partType)
-	}
-
-	if strings.Contains(inputPart, consts.LISTING_OPRATOR) {
-		return parsePartWithListing(inputPart, partType)
 	}
 
 	if inputPart == consts.ASTERIKS {
@@ -166,11 +166,23 @@ func parsePartWithRange(partWithRange string, partType consts.Value) ([]int, err
 
 func parsePartWithListing(partWithListing string, partType consts.Value) ([]int, error) {
 	split := strings.Split(partWithListing, consts.LISTING_OPRATOR)
-	multipleValues, err := helpers.GetMultipleIntsFromStringsSlice(split)
-	if err != nil {
-		return []int{}, err
+	res := []int{}
+	for _, elem := range split {
+		if strings.Contains(elem, consts.RANGE_OPERATOR) {
+			multipleValues, err := parsePartWithRange(elem, partType)
+			if err != nil {
+				return []int{}, err
+			}
+			res = append(res, multipleValues...)
+		} else {
+			parsed, err := strconv.Atoi(elem)
+			if err != nil {
+				return []int{}, err
+			}
+			res = append(res, parsed)
+		}
 	}
-	return multipleValues, nil
+	return res, nil
 }
 
 func parsePartWithAsteriks(partWithAsteriks string, partType consts.Value) ([]int, error) {
