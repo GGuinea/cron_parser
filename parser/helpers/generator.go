@@ -5,12 +5,23 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func GenerateValuesForRange(start string, stop string) ([]int, error) {
 	startParsed, err := strconv.Atoi(start)
 	if err != nil {
 		return []int{}, err
+	}
+
+	possibleWithStep := strings.Split(stop, consts.STEP_OPERATOR)
+	fmt.Println(possibleWithStep)
+	if len(possibleWithStep) > 1 {
+		stopParsed, err := strconv.Atoi(possibleWithStep[0])
+		if err != nil {
+			return []int{}, err
+		}
+		return GenerateValuesForRangeWithStep(start, possibleWithStep[1], stopParsed, stopParsed)
 	}
 
 	stopParsed, err := strconv.Atoi(stop)

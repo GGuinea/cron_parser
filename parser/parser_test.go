@@ -67,6 +67,7 @@ func TestShouldParseMinutesPartProperly(t *testing.T) {
 		{"1 1 1 1 1 cmd", []int{1}, "Should parse single value properly"},
 		{"1,2,3 1 1 1 1 cmd", []int{1, 2, 3}, "Should parse multiple values properly separated by comma"},
 		{"1-3,5,6,33-35 1 1 1 1 cmd", []int{1, 2, 3, 5, 6, 33, 34, 35}, "Should parse multiple values properly separated by comma"},
+		{"1-10/2 1 1 1 1 cmd", []int{1, 3, 5, 7, 9}, "Should parse multiple values properly separated by comma"},
 		{"1-4 1 1 1 1 cmd", []int{1, 2, 3, 4}, "Should parse range properly"},
 		{"1/10 1 1 1 1 cmd", []int{1, 11, 21, 31, 41, 51}, "Should parse range with step and starting point properly"},
 		{"*/10 1 1 1 1 cmd", []int{0, 10, 20, 30, 40, 50}, "Should parse range with step and asteriks properly"},

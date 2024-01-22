@@ -127,12 +127,12 @@ func parsePart(inputPart string, partType consts.Value) ([]int, error) {
 		return parsePartWithListing(inputPart, partType)
 	}
 
-	if strings.Contains(inputPart, consts.STEP_OPERATOR) {
-		return parsePartWithStep(inputPart, partType)
-	}
-
 	if strings.Contains(inputPart, consts.RANGE_OPERATOR) {
 		return parsePartWithRange(inputPart, partType)
+	}
+
+	if strings.Contains(inputPart, consts.STEP_OPERATOR) {
+		return parsePartWithStep(inputPart, partType)
 	}
 
 	if inputPart == consts.ASTERIKS {
