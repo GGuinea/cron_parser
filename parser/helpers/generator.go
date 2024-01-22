@@ -3,6 +3,7 @@ package helpers
 import (
 	"cron_expression_parser/parser/consts"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -29,9 +30,9 @@ func GenerateValuesForRange(start string, stop string) ([]int, error) {
 	return res, nil
 }
 
-func GenerateValuesForRangeWithStep(start string, step string, maxValue int) ([]int, error) {
+func GenerateValuesForRangeWithStep(start string, step string, maxValue, minValue int) ([]int, error) {
 	if start == consts.ASTERIKS {
-		return GenerateValuesForRangeWithStep("0", step, maxValue)
+		return GenerateValuesForRangeWithStep(fmt.Sprint(minValue), step, maxValue, minValue)
 	}
 
 	startParsed, err := strconv.Atoi(start)

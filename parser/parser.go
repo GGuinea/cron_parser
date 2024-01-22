@@ -27,7 +27,6 @@ func (p *Parser) Parse(input string) error {
 		return err
 	}
 	err = p.performParse(inputTab)
-	fmt.Println(consts.GetMinMinutesValue())
 	if err != nil {
 		return err
 	}
@@ -49,19 +48,28 @@ func getSplitInput(input string) ([]string, error) {
 }
 
 func (p *Parser) performParse(slicedInput []string) error {
-	res, err := parsePart(slicedInput[0])
-	p.minutes = res
+	minutesObj := &consts.Minutes{}
+	res, err := parsePart(slicedInput[0], minutesObj)
 	if err != nil {
 		return err
 	}
+	p.minutes = res
+
+	hoursObj := &consts.Hours{}
+
+	res, err = parsePart(slicedInput[1], hoursObj)
+	if err != nil {
+		return err
+	}
+	p.hours = res
 
 	return nil
 }
 
-func parsePart(minutes string) ([]int, error) {
+func parsePart(minutes string, partType consts.Value) ([]int, error) {
 	if strings.Contains(minutes, consts.STEP_OPERATOR) {
 		split := strings.Split(minutes, consts.STEP_OPERATOR)
-		multipleValues, err := helpers.GenerateValuesForRangeWithStep(split[0], split[1], 59)
+		multipleValues, err := helpers.GenerateValuesForRangeWithStep(split[0], split[1], partType.GetMaxValue(), partType.GetMinValue())
 		if err != nil {
 			return []int{}, err
 		}
@@ -87,7 +95,7 @@ func parsePart(minutes string) ([]int, error) {
 	}
 
 	if minutes == consts.ASTERIKS {
-		multipleValues, err := helpers.GenerateValuesForRange("0", "59")
+		multipleValues, err := helpers.GenerateValuesForRange(fmt.Sprint(partType.GetMinValue()), fmt.Sprint(partType.GetMaxValue()))
 		if err != nil {
 			return []int{}, err
 		}
