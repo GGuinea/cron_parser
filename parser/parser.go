@@ -10,11 +10,12 @@ import (
 )
 
 type Parser struct {
-	minutes []int
-	hours   []int
-	days    []int
-	months  []int
-	command string
+	minutes     []int
+	hours       []int
+	daysOfMonth []int
+	daysOfWeek  []int
+	months      []int
+	command     string
 }
 
 func NewParser() *Parser {
@@ -41,7 +42,7 @@ func getSplitInput(input string) ([]string, error) {
 
 	split := strings.Split(input, " ")
 
-	if len(split) != 6 {
+	if len(split) < 6 {
 		return []string{}, errors.New("Input is in wrong format, should be: '* * * * * Command_to_execute'")
 	}
 	return split, nil
@@ -56,13 +57,35 @@ func (p *Parser) performParse(slicedInput []string) error {
 	p.minutes = res
 
 	hoursObj := &consts.Hours{}
-
 	res, err = parsePart(slicedInput[1], hoursObj)
 	if err != nil {
 		return err
 	}
 	p.hours = res
 
+	daysObj := &consts.DayOfMonth{}
+	res, err = parsePart(slicedInput[2], daysObj)
+	if err != nil {
+		return err
+	}
+	p.daysOfMonth = res
+
+	monthsObj := &consts.Month{}
+	res, err = parsePart(slicedInput[3], monthsObj)
+	if err != nil {
+		return err
+	}
+	p.months = res
+
+	daysOfWeekObj := &consts.DayOfWeek{}
+	res, err = parsePart(slicedInput[4], daysOfWeekObj)
+	if err != nil {
+		return err
+	}
+	p.daysOfWeek = res
+
+	command := slicedInput[5:]
+	p.command = strings.Join(command, " ")
 	return nil
 }
 
