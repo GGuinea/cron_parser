@@ -1,7 +1,11 @@
 package parser
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -200,4 +204,39 @@ func TestShouldParseCommandPartProperly(t *testing.T) {
 			t.Fatalf("%s, expected: %v, actual: %v", scenario.comment, scenario.expected, parser.command)
 		}
 	}
+}
+
+func TestShouldPrintAllValuesWithProperFormat(t *testing.T) {
+	expectedOutput :=
+		`minute        1 
+hour          1 
+day of month  1 
+month         1 
+day of week   1 
+command       cmd`
+
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	parser := NewParser()
+	err := parser.Parse("1 1 1 1 1 cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	parser.PrintCurrentCronExpression()
+
+	w.Close()
+	out, _ := io.ReadAll(r)
+	os.Stdout = rescueStdout
+	fmt.Println(strings.Contains(string(out), expectedOutput))
+
+	evaluated := strings.Trim(string(out), "")
+	evaluated = strings.Trim(string(out), "\n")
+
+	if reflect.DeepEqual(evaluated, expectedOutput) != true {
+		t.Fatalf("Should print all values with proper format")
+	}
+
 }

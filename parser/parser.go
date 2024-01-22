@@ -35,6 +35,28 @@ func (p *Parser) Parse(input string) error {
 	return nil
 }
 
+func (p *Parser) PrintCurrentCronExpression() {
+	printField("minute", p.minutes)
+	printField("hour", p.hours)
+	printField("day of month", p.daysOfMonth)
+	printField("month", p.months)
+	printField("day of week", p.daysOfWeek)
+	printStringField("command", p.command)
+	fmt.Println()
+}
+
+func printField(fieldName string, field []int) {
+	fmt.Printf("%-14s", fieldName)
+	for i := 0; i < len(field); i++ {
+		fmt.Printf("%d ", field[i])
+	}
+	fmt.Printf("\n")
+}
+
+func printStringField(fieldName string, field string) {
+	fmt.Printf("%-14s%s\n", fieldName, field)
+}
+
 func getSplitInput(input string) ([]string, error) {
 	if len(input) == 0 {
 		return []string{}, errors.New("Input length should not be 0")
