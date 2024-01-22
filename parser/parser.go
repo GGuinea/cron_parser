@@ -5,6 +5,7 @@ import (
 	"cron_expression_parser/parser/helpers"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -18,7 +19,15 @@ type Parser struct {
 	command     string
 }
 
+var valueToParseMap = map[int]consts.Value{}
+
 func NewParser() *Parser {
+	valueToParseMap[0] = &consts.Minutes{Name: "minutes"}
+	valueToParseMap[1] = &consts.Hours{Name: "hours"}
+	valueToParseMap[2] = &consts.DayOfMonth{Name: "day of month"}
+	valueToParseMap[3] = &consts.Month{Name: "month"}
+	valueToParseMap[4] = &consts.DayOfWeek{Name: "day of week"}
+
 	return &Parser{}
 }
 
@@ -71,44 +80,46 @@ func getSplitInput(input string) ([]string, error) {
 }
 
 func (p *Parser) performParse(slicedInput []string) error {
-	minutesObj := &consts.Minutes{}
-	res, err := parsePart(slicedInput[0], minutesObj)
-	if err != nil {
-		return err
-	}
-	p.minutes = res
 
-	hoursObj := &consts.Hours{}
-	res, err = parsePart(slicedInput[1], hoursObj)
-	if err != nil {
-		return err
-	}
-	p.hours = res
+	for key, val := range valueToParseMap {
+		res, err := parsePart(slicedInput[key], val)
+		if err != nil {
+			return err
+		}
 
-	daysObj := &consts.DayOfMonth{}
-	res, err = parsePart(slicedInput[2], daysObj)
-	if err != nil {
-		return err
-	}
-	p.daysOfMonth = res
+		if !isOutputValid(res, val) {
+			return errors.New(fmt.Sprintf("Wrong range for %s, range: %d-%d; should be with range: %d-%d",
+				val.GetName(), slices.Min(res), slices.Max(res), val.GetMinValue(), val.GetMaxValue()))
+		}
 
-	monthsObj := &consts.Month{}
-	res, err = parsePart(slicedInput[3], monthsObj)
-	if err != nil {
-		return err
+		switch key {
+		case 0:
+			p.minutes = res
+		case 1:
+			p.hours = res
+		case 2:
+			p.daysOfMonth = res
+		case 3:
+			p.months = res
+		case 4:
+			p.daysOfWeek = res
+		}
 	}
-	p.months = res
-
-	daysOfWeekObj := &consts.DayOfWeek{}
-	res, err = parsePart(slicedInput[4], daysOfWeekObj)
-	if err != nil {
-		return err
-	}
-	p.daysOfWeek = res
 
 	command := slicedInput[5:]
 	p.command = strings.Join(command, " ")
 	return nil
+}
+
+func isOutputValid(output []int, partType consts.Value) bool {
+	if len(output) == 0 {
+		return false
+	}
+
+	if !helpers.AreAllInRange(output, partType.GetMinValue(), partType.GetMaxValue()) {
+		return false
+	}
+	return true
 }
 
 func parsePart(minutes string, partType consts.Value) ([]int, error) {
