@@ -1,4 +1,5 @@
 # Cron Expression Parser
+Implemented most of the rules from: https://ss64.com/mac/crontab.html
 
 ## How to build and run app?
 
