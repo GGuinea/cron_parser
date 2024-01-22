@@ -32,6 +32,27 @@ func TestShouldReturnErrorWhenInputDoesNotHaveSixParts(t *testing.T) {
 	}
 }
 
+func TestShouldReturnErrorWhenInputHasWrongRange(t *testing.T) {
+	testScenarios := []struct {
+		input   string
+		comment string
+	}{
+		{"61 1 1 1 1 cmd", "Should return error when minutes is not in range"},
+		{"1 61 1 1 1 cmd", "Should return error when hours is not in range"},
+		{"1 1 32 1 1 cmd", "Should return error when day of month is not in range"},
+		{"1 1 1 13 1 cmd", "Should return error when month is not in range"},
+		{"1 1 1 1 7 cmd", "Should return error when day of week is not in range range"},
+	}
+
+	for _, scenario := range testScenarios {
+		parser := NewParser()
+		err := parser.Parse(scenario.input)
+		if err == nil {
+			t.Fatalf("%s", scenario.comment)
+		}
+	}
+}
+
 func TestShouldParseMinutesPartProperly(t *testing.T) {
 	allMinutes := []int{}
 	for i := 0; i < 60; i++ {
