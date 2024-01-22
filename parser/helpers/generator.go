@@ -15,7 +15,6 @@ func GenerateValuesForRange(start string, stop string) ([]int, error) {
 	}
 
 	possibleWithStep := strings.Split(stop, consts.STEP_OPERATOR)
-	fmt.Println(possibleWithStep)
 	if len(possibleWithStep) > 1 {
 		stopParsed, err := strconv.Atoi(possibleWithStep[0])
 		if err != nil {

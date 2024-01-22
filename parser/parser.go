@@ -51,7 +51,6 @@ func (p *Parser) PrintCurrentCronExpression() {
 	printField("month", p.months)
 	printField("day of week", p.daysOfWeek)
 	printStringField("command", p.command)
-	fmt.Println()
 }
 
 func printField(fieldName string, field []int) {
@@ -63,7 +62,7 @@ func printField(fieldName string, field []int) {
 }
 
 func printStringField(fieldName string, field string) {
-	fmt.Printf("%-14s%s\n", fieldName, field)
+	fmt.Printf("%-14s%s", fieldName, field)
 }
 
 func getSplitInput(input string) ([]string, error) {
