@@ -53,157 +53,238 @@ func TestShouldReturnErrorWhenInputHasWrongRange(t *testing.T) {
 	}
 }
 
-func TestShouldParseMinutesPartProperly(t *testing.T) {
+func TestShouldParseSimpleOneDigitValuesProperly(t *testing.T) {
+	parser := NewParser()
+	err := parser.Parse("1 1 1 1 1 cmd")
+
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	if !reflect.DeepEqual(parser.minutes, []int{1}) {
+		t.Fatalf("Should parse minutes properly, expected: %v, actual: %v", []int{1}, parser.minutes)
+	}
+
+	if !reflect.DeepEqual(parser.hours, []int{1}) {
+		t.Fatalf("Should parse hours properly, expected: %v, actual: %v", []int{1}, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, []int{1}) {
+		t.Fatalf("Should parse days of month properly, expected: %v, actual: %v", []int{1}, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, []int{1}) {
+		t.Fatalf("Should parse months properly, expected: %v, actual: %v", []int{1}, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, []int{1}) {
+		t.Fatalf("Should parse days of week properly, expected: %v, actual: %v", []int{1}, parser.daysOfWeek)
+	}
+}
+
+func TestShouldParseAllValuesAsAsteriksAndReturnAllPossibleValues(t *testing.T) {
 	allMinutes := []int{}
 	for i := 0; i < 60; i++ {
 		allMinutes = append(allMinutes, i)
 	}
 
-	testScenarios := []struct {
-		input    string
-		expected []int
-		comment  string
-	}{
-		{"1 1 1 1 1 cmd", []int{1}, "Should parse single value properly"},
-		{"1,2,3 1 1 1 1 cmd", []int{1, 2, 3}, "Should parse multiple values properly separated by comma"},
-		{"1-3,5,6,33-35 1 1 1 1 cmd", []int{1, 2, 3, 5, 6, 33, 34, 35}, "Should parse multiple values properly separated by comma"},
-		{"1-10/2 1 1 1 1 cmd", []int{1, 3, 5, 7, 9}, "Should parse multiple values properly separated by comma"},
-		{"1-4 1 1 1 1 cmd", []int{1, 2, 3, 4}, "Should parse range properly"},
-		{"1/10 1 1 1 1 cmd", []int{1, 11, 21, 31, 41, 51}, "Should parse range with step and starting point properly"},
-		{"*/10 1 1 1 1 cmd", []int{0, 10, 20, 30, 40, 50}, "Should parse range with step and asteriks properly"},
-		{"* 1 1 1 1 cmd", allMinutes, "Should parse asteriks properly"},
-	}
-
-	for _, scenario := range testScenarios {
-		parser := NewParser()
-		err := parser.Parse(scenario.input)
-		if err != nil {
-			t.Fatalf("Should not return error with proper input; %s", err)
-		}
-
-		if !reflect.DeepEqual(parser.minutes, scenario.expected) {
-			t.Fatalf("%s, expected: %v, actual: %v", scenario.comment, scenario.expected, parser.minutes)
-		}
-	}
-}
-
-func TestShouldParseHoursPartProperly(t *testing.T) {
 	allHours := []int{}
 	for i := 0; i < 24; i++ {
 		allHours = append(allHours, i)
 	}
 
-	testScenarios := []struct {
-		input    string
-		expected []int
-		comment  string
-	}{
-		{"1 3 1 1 1 cmd", []int{3}, "Should parse single value properly"},
-		{"1 1-4 1 1 1 cmd", []int{1, 2, 3, 4}, "Should parse range properly"},
-		{"1 1/10 1 1 1 cmd", []int{1, 11, 21}, "Should parse range with step and starting point properly"},
-		{"1 */10 1 1 1 cmd", []int{0, 10, 20}, "Should parse range with step and asteriks properly"},
-		{"1 * 1 1 1 cmd", allHours, "Should parse asteriks properly"},
-	}
-	for _, scenario := range testScenarios {
-		parser := NewParser()
-		err := parser.Parse(scenario.input)
-		if err != nil {
-			t.Fatalf("Should not return error with proper input; %s", err)
-		}
-
-		if !reflect.DeepEqual(parser.hours, scenario.expected) {
-			t.Fatalf("%s, expected: %v, actual: %v", scenario.comment, scenario.expected, parser.hours)
-		}
-	}
-}
-
-func TestShouldParseDaysOfMonthPartProperly(t *testing.T) {
 	allDays := []int{}
 	for i := 1; i <= 31; i++ {
 		allDays = append(allDays, i)
 	}
 
-	testScenarios := []struct {
-		input    string
-		expected []int
-		comment  string
-	}{
-		{"1 1 1 1 1 cmd", []int{1}, "Should parse single value properly"},
-		{"1 1 1-4 1 1 cmd", []int{1, 2, 3, 4}, "Should parse range properly"},
-		{"1 1 2/10 1 1 cmd", []int{2, 12, 22}, "Should parse range with step and starting point properly"},
-		{"1 1 */10 1 1 cmd", []int{1, 11, 21, 31}, "Should parse range with step and asteriks properly"},
-		{"1 1 * 1 1 cmd", allDays, "Should parse asteriks properly"},
-	}
-	for _, scenario := range testScenarios {
-		parser := NewParser()
-		err := parser.Parse(scenario.input)
-		if err != nil {
-			t.Fatalf("Should not return error with proper input; %s", err)
-		}
-
-		if !reflect.DeepEqual(parser.daysOfMonth, scenario.expected) {
-			t.Fatalf("%s, expected: %v, actual: %v", scenario.comment, scenario.expected, parser.daysOfMonth)
-		}
-	}
-}
-
-func TestShouldParseMonthsPartProperly(t *testing.T) {
 	allMonths := []int{}
 	for i := 1; i <= 12; i++ {
 		allMonths = append(allMonths, i)
 	}
 
-	testScenarios := []struct {
-		input    string
-		expected []int
-		comment  string
-	}{
-		{"1 1 1 1 1 cmd", []int{1}, "Should parse single value properly"},
-		{"1 1 1 1-4 1 cmd", []int{1, 2, 3, 4}, "Should parse range properly"},
-		{"1 1 1 2/10 1 cmd", []int{2, 12}, "Should parse range with step and starting point properly"},
-		{"1 1 1 */10 1 cmd", []int{1, 11}, "Should parse range with step and asteriks properly"},
-		{"1 1 1 * 1 cmd", allMonths, "Should parse asteriks properly"},
+	allDaysOfWeek := []int{}
+	for i := 0; i <= 6; i++ {
+		allDaysOfWeek = append(allDaysOfWeek, i)
 	}
-	for _, scenario := range testScenarios {
-		parser := NewParser()
-		err := parser.Parse(scenario.input)
-		if err != nil {
-			t.Fatalf("Should not return error with proper input; %s", err)
-		}
 
-		if !reflect.DeepEqual(parser.months, scenario.expected) {
-			t.Fatalf("%s, expected: %v, actual: %v", scenario.comment, scenario.expected, parser.months)
-		}
+	parser := NewParser()
+	err := parser.Parse("* * * * * cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	if !reflect.DeepEqual(parser.minutes, allMinutes) {
+		t.Fatalf("Should parse asteriks properly for minutes, expected: %v, actual: %v", allMinutes, parser.minutes)
+	}
+
+	if !reflect.DeepEqual(parser.hours, allHours) {
+		t.Fatalf("Should parse asteriks properly for hours, expected: %v, actual: %v", allHours, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, allDays) {
+		t.Fatalf("Should parse asteriks properly for days of month, expected: %v, actual: %v", allDays, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, allMonths) {
+		t.Fatalf("Should parse asteriks properly for months, expected: %v, actual: %v", allMonths, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, allDaysOfWeek) {
+		t.Fatalf("Should parse asteriks properly for days of week, expected: %v, actual: %v", allDaysOfWeek, parser.daysOfWeek)
 	}
 }
 
-func TestShouldParseDayOfWeekPartProperly(t *testing.T) {
-	allDays := []int{}
-	for i := 0; i <= 6; i++ {
-		allDays = append(allDays, i)
+func TestShouldParseListingValuesProperly(t *testing.T) {
+	parser := NewParser()
+	expected := []int{1, 2, 3}
+	err := parser.Parse("1,2,3 1,2,3 1,2,3 1,2,3 1,2,3 cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
 	}
 
-	testScenarios := []struct {
-		input    string
-		expected []int
-		comment  string
-	}{
-		{"1 1 1 1 1 cmd", []int{1}, "Should parse single value properly"},
-		{"1 1 1 1 1-4 cmd", []int{1, 2, 3, 4}, "Should parse range properly"},
-		{"1 1 1 1 2/10 cmd", []int{2}, "Should parse range with step and starting point properly"},
-		{"1 1 1 1 */10 cmd", []int{0}, "Should parse range with step and asteriks properly"},
-		{"1 1 1 1 * cmd", allDays, "Should parse asteriks properly"},
+	if !reflect.DeepEqual(parser.minutes, expected) {
+		t.Fatalf("Should parse listing values properly for minutes, expected: %v, actual: %v", expected, parser.minutes)
 	}
-	for _, scenario := range testScenarios {
-		parser := NewParser()
-		err := parser.Parse(scenario.input)
-		if err != nil {
-			t.Fatalf("Should not return error with proper input; %s", err)
-		}
 
-		if !reflect.DeepEqual(parser.daysOfWeek, scenario.expected) {
-			t.Fatalf("%s, expected: %v, actual: %v", scenario.comment, scenario.expected, parser.daysOfWeek)
-		}
+	if !reflect.DeepEqual(parser.hours, expected) {
+		t.Fatalf("Should parse listing values properly for hours, expected: %v, actual: %v", expected, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, expected) {
+		t.Fatalf("Should parse listing values properly for days of month, expected: %v, actual: %v", expected, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, expected) {
+		t.Fatalf("Should parse listing values properly for months, expected: %v, actual: %v", expected, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, expected) {
+		t.Fatalf("Should parse listing values properly for days of week, expected: %v, actual: %v", expected, parser.daysOfWeek)
+	}
+}
+
+func TestShouldParseRangeValuesProperly(t *testing.T) {
+	parser := NewParser()
+	expected := []int{1, 2, 3}
+	err := parser.Parse("1-3 1-3 1-3 1-3 1-3 cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	if !reflect.DeepEqual(parser.minutes, expected) {
+		t.Fatalf("Should parse listing values properly for minutes, expected: %v, actual: %v", expected, parser.minutes)
+	}
+
+	if !reflect.DeepEqual(parser.hours, expected) {
+		t.Fatalf("Should parse listing values properly for hours, expected: %v, actual: %v", expected, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, expected) {
+		t.Fatalf("Should parse listing values properly for days of month, expected: %v, actual: %v", expected, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, expected) {
+		t.Fatalf("Should parse listing values properly for months, expected: %v, actual: %v", expected, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, expected) {
+		t.Fatalf("Should parse listing values properly for days of week, expected: %v, actual: %v", expected, parser.daysOfWeek)
+	}
+}
+
+func TestShouldParseListingAndRangeValuesProperly(t *testing.T) {
+	parser := NewParser()
+	expected := []int{1, 2, 3, 5, 6, 9, 10, 11}
+	expectedDayOfWeek := []int{1, 2, 3, 5, 6}
+	err := parser.Parse("1-3,5,6,9-11 1-3,5,6,9-11 1-3,5,6,9-11 1-3,5,6,9-11 1-3,5,6 cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	if !reflect.DeepEqual(parser.minutes, expected) {
+		t.Fatalf("Should parse listing values properly for minutes, expected: %v, actual: %v", expected, parser.minutes)
+	}
+
+	if !reflect.DeepEqual(parser.hours, expected) {
+		t.Fatalf("Should parse listing values properly for hours, expected: %v, actual: %v", expected, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, expected) {
+		t.Fatalf("Should parse listing values properly for days of month, expected: %v, actual: %v", expected, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, expected) {
+		t.Fatalf("Should parse listing values properly for months, expected: %v, actual: %v", expected, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, expectedDayOfWeek) {
+		t.Fatalf("Should parse listing values properly for days of week, expected: %v, actual: %v", expectedDayOfWeek, parser.daysOfWeek)
+	}
+}
+
+func TestShouldParseStepValuesProperly(t *testing.T) {
+	parser := NewParser()
+
+	expectedMinutes := []int{1, 21, 41}
+	expectedHours := []int{1, 11, 21}
+	expectedDaysOfMonth := []int{1, 11, 21, 31}
+	expectedMonth := []int{1, 11}
+	expectedDayOfWeek := []int{1, 3, 5}
+
+	err := parser.Parse("1/20 1/10 1/10 1/10 1/2 cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	if !reflect.DeepEqual(parser.minutes, expectedMinutes) {
+		t.Fatalf("Should parse listing values properly for minutes, expected: %v, actual: %v", expectedMinutes, parser.minutes)
+	}
+
+	if !reflect.DeepEqual(parser.hours, expectedHours) {
+		t.Fatalf("Should parse listing values properly for hours, expected: %v, actual: %v", expectedHours, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, expectedDaysOfMonth) {
+		t.Fatalf("Should parse listing values properly for days of month, expected: %v, actual: %v", expectedDaysOfMonth, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, expectedMonth) {
+		t.Fatalf("Should parse listing values properly for months, expected: %v, actual: %v", expectedMonth, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, expectedDayOfWeek) {
+		t.Fatalf("Should parse listing values properly for days of week, expected: %v, actual: %v", expectedDayOfWeek, parser.daysOfWeek)
+	}
+}
+
+func TestShouldParseRangeWithStepValuesProperly(t *testing.T) {
+	parser := NewParser()
+	expected := []int{1, 3, 5, 7, 9}
+	expectedDayOfWeek := []int{1, 3, 5}
+	err := parser.Parse("1-10/2 1-10/2 1-10/2 1-10/2 1-6/2 cmd")
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+
+	if !reflect.DeepEqual(parser.minutes, expected) {
+		t.Fatalf("Should parse listing values properly for minutes, expected: %v, actual: %v", expected, parser.minutes)
+	}
+
+	if !reflect.DeepEqual(parser.hours, expected) {
+		t.Fatalf("Should parse listing values properly for hours, expected: %v, actual: %v", expected, parser.hours)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfMonth, expected) {
+		t.Fatalf("Should parse listing values properly for days of month, expected: %v, actual: %v", expected, parser.daysOfMonth)
+	}
+
+	if !reflect.DeepEqual(parser.months, expected) {
+		t.Fatalf("Should parse listing values properly for months, expected: %v, actual: %v", expected, parser.months)
+	}
+
+	if !reflect.DeepEqual(parser.daysOfWeek, expectedDayOfWeek) {
+		t.Fatalf("Should parse listing values properly for days of week, expected: %v, actual: %v", expectedDayOfWeek, parser.daysOfWeek)
 	}
 }
 
@@ -263,4 +344,35 @@ command       cmd`
 		t.Fatalf("Should print all values with proper format")
 	}
 
+}
+
+func TestShouldParseProperlyExample(t *testing.T) {
+	input := "*/15 0 1,15 * 1-5 /usr/bin/find"
+	parser := NewParser()
+	err := parser.Parse(input)
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+	if reflect.DeepEqual(parser.minutes, []int{0, 15, 30, 45}) != true {
+		t.Fatalf("Should parse minutes properly")
+	}
+	if reflect.DeepEqual(parser.hours, []int{0}) != true {
+		t.Fatalf("Should parse hours properly")
+	}
+
+	if reflect.DeepEqual(parser.daysOfMonth, []int{1, 15}) != true {
+		t.Fatalf("Should parse days of month properly")
+	}
+
+	if reflect.DeepEqual(parser.months, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}) != true {
+		t.Fatalf("Should parse months properly")
+	}
+
+	if reflect.DeepEqual(parser.daysOfWeek, []int{1, 2, 3, 4, 5}) != true {
+		t.Fatalf("Should parse days of week properly")
+	}
+
+	if parser.command != "/usr/bin/find" {
+		t.Fatalf("Should parse command properly")
+	}
 }
