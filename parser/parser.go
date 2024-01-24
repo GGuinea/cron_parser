@@ -122,6 +122,14 @@ func isOutputValid(output []int, partType consts.Value) bool {
 }
 
 func parsePart(inputPart string, partType consts.Value) ([]int, error) {
+	for key, val := range consts.DayOfWeekToNum {
+		inputPart = strings.ReplaceAll(inputPart, key, val)
+	}
+
+	for key, val := range consts.MonthToNum{
+		inputPart = strings.ReplaceAll(inputPart, key, val)
+	}
+
 	if strings.Contains(inputPart, consts.LISTING_OPRATOR) {
 		return parsePartWithListing(inputPart, partType)
 	}

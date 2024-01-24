@@ -376,3 +376,63 @@ func TestShouldParseProperlyExample(t *testing.T) {
 		t.Fatalf("Should parse command properly")
 	}
 }
+
+func TestShouldParseProperlyDaysAsString(t *testing.T) {
+	input := "*/15 0 1,15 * MON /usr/bin/find"
+	parser := NewParser()
+	err := parser.Parse(input)
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+	if reflect.DeepEqual(parser.daysOfWeek, []int{1}) != true {
+		t.Fatalf("Should parse minutes properly")
+	}
+}
+
+func TestShouldParseProperlyDaysAsString2(t *testing.T) {
+	input := "*/15 0 1,15 * SUN /usr/bin/find"
+	parser := NewParser()
+	err := parser.Parse(input)
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+	if reflect.DeepEqual(parser.daysOfWeek, []int{0}) != true {
+		t.Fatalf("Should parse minutes properly")
+	}
+}
+
+func TestShouldParseProperlyDaysAsStringInRange(t *testing.T) {
+	input := "*/15 0 1,15 * MON-FRI /usr/bin/find"
+	parser := NewParser()
+	err := parser.Parse(input)
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+	if reflect.DeepEqual(parser.daysOfWeek, []int{1, 2, 3, 4, 5}) != true {
+		t.Fatalf("Should parse minutes properly")
+	}
+}
+
+func TestShouldParseProperlyDaysAsStringWithCommas(t *testing.T) {
+	input := "*/15 0 1,15 * MON,FRI /usr/bin/find"
+	parser := NewParser()
+	err := parser.Parse(input)
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+	if reflect.DeepEqual(parser.daysOfWeek, []int{1, 5}) != true {
+		t.Fatalf("Should parse minutes properly")
+	}
+}
+
+func TestShouldParseProperlyMonthAsString(t *testing.T) {
+	input := "*/15 0 1,15 JAN-MAR MON,FRI /usr/bin/find"
+	parser := NewParser()
+	err := parser.Parse(input)
+	if err != nil {
+		t.Fatalf("Should not return error with proper input; %s", err)
+	}
+	if reflect.DeepEqual(parser.months, []int{1, 2, 3}) != true {
+		t.Fatalf("Should parse minutes properly")
+	}
+}

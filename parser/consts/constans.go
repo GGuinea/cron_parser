@@ -25,6 +25,31 @@ var allowed_month_values = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
 var allowed_day_of_week_values = []int{0, 2, 3, 4, 5, 6}
 
+var DayOfWeekToNum = map[string]string{
+	"SUN": "0",
+	"MON": "1",
+	"TUE": "2",
+	"WED": "3",
+	"THU": "4",
+	"FRI": "5",
+	"SAT": "6",
+}
+
+var MonthToNum = map[string]string{
+	"JAN":  "1",
+	"FEB":  "2",
+	"MAR":  "3",
+	"APR":  "4",
+	"MAY":  "5",
+	"JUNE": "6",
+	"JULY": "7",
+	"AUG":  "8",
+	"SEP":  "9",
+	"OCT":  "10",
+	"NOV":  "11",
+	"DEC":  "12",
+}
+
 type Value interface {
 	GetAllowedValues() []int
 	GetMinValue() int
