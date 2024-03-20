@@ -1,4 +1,6 @@
 # Cron Expression Parser
+App allows to explain rules in cron syntax:
+``` "*/15 0 1,15 * 1-5 /usr/bin/find"```
 
 Implemented most of the rules from: https://ss64.com/mac/crontab.html
 
